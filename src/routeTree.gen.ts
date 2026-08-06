@@ -13,8 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CommandRouteImport } from './routes/command'
 import { Route as CommandIndexRouteImport } from './routes/command.index'
 import { Route as CommandAnalyticsRouteImport } from './routes/command.analytics'
+import { Route as CommandAppsRouteImport } from './routes/command.apps'
 import { Route as CommandHiveRouteImport } from './routes/command.hive'
+import { Route as CommandSettingsRouteImport } from './routes/command.settings'
 import { Route as CommandThreatsRouteImport } from './routes/command.threats'
+import { Route as CommandTimelineRouteImport } from './routes/command.timeline'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,9 +39,19 @@ const CommandAnalyticsRoute = CommandAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => CommandRoute,
 } as any)
+const CommandAppsRoute = CommandAppsRouteImport.update({
+  id: '/apps',
+  path: '/apps',
+  getParentRoute: () => CommandRoute,
+} as any)
 const CommandHiveRoute = CommandHiveRouteImport.update({
   id: '/hive',
   path: '/hive',
+  getParentRoute: () => CommandRoute,
+} as any)
+const CommandSettingsRoute = CommandSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => CommandRoute,
 } as any)
 const CommandThreatsRoute = CommandThreatsRouteImport.update({
@@ -46,20 +59,31 @@ const CommandThreatsRoute = CommandThreatsRouteImport.update({
   path: '/threats',
   getParentRoute: () => CommandRoute,
 } as any)
+const CommandTimelineRoute = CommandTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => CommandRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/command': typeof CommandRouteWithChildren
   '/command/analytics': typeof CommandAnalyticsRoute
+  '/command/apps': typeof CommandAppsRoute
   '/command/hive': typeof CommandHiveRoute
+  '/command/settings': typeof CommandSettingsRoute
   '/command/threats': typeof CommandThreatsRoute
+  '/command/timeline': typeof CommandTimelineRoute
   '/command/': typeof CommandIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/command/analytics': typeof CommandAnalyticsRoute
+  '/command/apps': typeof CommandAppsRoute
   '/command/hive': typeof CommandHiveRoute
+  '/command/settings': typeof CommandSettingsRoute
   '/command/threats': typeof CommandThreatsRoute
+  '/command/timeline': typeof CommandTimelineRoute
   '/command': typeof CommandIndexRoute
 }
 export interface FileRoutesById {
@@ -67,8 +91,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/command': typeof CommandRouteWithChildren
   '/command/analytics': typeof CommandAnalyticsRoute
+  '/command/apps': typeof CommandAppsRoute
   '/command/hive': typeof CommandHiveRoute
+  '/command/settings': typeof CommandSettingsRoute
   '/command/threats': typeof CommandThreatsRoute
+  '/command/timeline': typeof CommandTimelineRoute
   '/command/': typeof CommandIndexRoute
 }
 export interface FileRouteTypes {
@@ -77,23 +104,32 @@ export interface FileRouteTypes {
     | '/'
     | '/command'
     | '/command/analytics'
+    | '/command/apps'
     | '/command/hive'
+    | '/command/settings'
     | '/command/threats'
+    | '/command/timeline'
     | '/command/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/command/analytics'
+    | '/command/apps'
     | '/command/hive'
+    | '/command/settings'
     | '/command/threats'
+    | '/command/timeline'
     | '/command'
   id:
     | '__root__'
     | '/'
     | '/command'
     | '/command/analytics'
+    | '/command/apps'
     | '/command/hive'
+    | '/command/settings'
     | '/command/threats'
+    | '/command/timeline'
     | '/command/'
   fileRoutesById: FileRoutesById
 }
@@ -132,11 +168,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommandAnalyticsRouteImport
       parentRoute: typeof CommandRoute
     }
+    '/command/apps': {
+      id: '/command/apps'
+      path: '/apps'
+      fullPath: '/command/apps'
+      preLoaderRoute: typeof CommandAppsRouteImport
+      parentRoute: typeof CommandRoute
+    }
     '/command/hive': {
       id: '/command/hive'
       path: '/hive'
       fullPath: '/command/hive'
       preLoaderRoute: typeof CommandHiveRouteImport
+      parentRoute: typeof CommandRoute
+    }
+    '/command/settings': {
+      id: '/command/settings'
+      path: '/settings'
+      fullPath: '/command/settings'
+      preLoaderRoute: typeof CommandSettingsRouteImport
       parentRoute: typeof CommandRoute
     }
     '/command/threats': {
@@ -146,20 +196,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommandThreatsRouteImport
       parentRoute: typeof CommandRoute
     }
+    '/command/timeline': {
+      id: '/command/timeline'
+      path: '/timeline'
+      fullPath: '/command/timeline'
+      preLoaderRoute: typeof CommandTimelineRouteImport
+      parentRoute: typeof CommandRoute
+    }
   }
 }
 
 interface CommandRouteChildren {
   CommandAnalyticsRoute: typeof CommandAnalyticsRoute
+  CommandAppsRoute: typeof CommandAppsRoute
   CommandHiveRoute: typeof CommandHiveRoute
+  CommandSettingsRoute: typeof CommandSettingsRoute
   CommandThreatsRoute: typeof CommandThreatsRoute
+  CommandTimelineRoute: typeof CommandTimelineRoute
   CommandIndexRoute: typeof CommandIndexRoute
 }
 
 const CommandRouteChildren: CommandRouteChildren = {
   CommandAnalyticsRoute: CommandAnalyticsRoute,
+  CommandAppsRoute: CommandAppsRoute,
   CommandHiveRoute: CommandHiveRoute,
+  CommandSettingsRoute: CommandSettingsRoute,
   CommandThreatsRoute: CommandThreatsRoute,
+  CommandTimelineRoute: CommandTimelineRoute,
   CommandIndexRoute: CommandIndexRoute,
 }
 
