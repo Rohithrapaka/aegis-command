@@ -68,8 +68,8 @@ export function Particles({
     };
     tick();
 
-    const io = new IntersectionObserver(([entry]) => {
-      running = entry.isIntersecting;
+    const io = new IntersectionObserver((entries) => {
+      running = entries[0]?.isIntersecting ?? false;
       if (running) tick();
       else cancelAnimationFrame(raf);
     });
