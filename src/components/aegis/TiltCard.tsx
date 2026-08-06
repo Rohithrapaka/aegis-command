@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "motion/react";
 import type { MouseEvent, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -22,8 +22,9 @@ export function TiltCard({
     stiffness: 140,
     damping: 20,
   });
-  const shineX = useTransform(mx, (v) => `${v * 100}%`);
-  const shineY = useTransform(my, (v) => `${v * 100}%`);
+  const shineX = useTransform(mx, (v) => v * 100);
+  const shineY = useTransform(my, (v) => v * 100);
+  const shine = useMotionTemplate`radial-gradient(340px circle at ${shineX}% ${shineY}%, color-mix(in oklab, var(--gold) 16%, transparent), transparent 70%)`;
 
   const onMove = (e: MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -43,11 +44,8 @@ export function TiltCard({
     >
       <motion.span
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 hover:opacity-100"
-        style={{
-          background: `radial-gradient(340px circle at ${shineX} ${shineY}, color-mix(in oklab, var(--gold) 16%, transparent), transparent 70%)`,
-          opacity: 1,
-        }}
+        className="pointer-events-none absolute inset-0"
+        style={{ backgroundImage: shine }}
       />
       <div className="relative">{children}</div>
     </motion.div>
