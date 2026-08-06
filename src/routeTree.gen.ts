@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CommandRouteImport } from './routes/command'
 import { Route as CommandIndexRouteImport } from './routes/command.index'
+import { Route as CommandAnalyticsRouteImport } from './routes/command.analytics'
 import { Route as CommandHiveRouteImport } from './routes/command.hive'
+import { Route as CommandThreatsRouteImport } from './routes/command.threats'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,36 +31,70 @@ const CommandIndexRoute = CommandIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CommandRoute,
 } as any)
+const CommandAnalyticsRoute = CommandAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => CommandRoute,
+} as any)
 const CommandHiveRoute = CommandHiveRouteImport.update({
   id: '/hive',
   path: '/hive',
+  getParentRoute: () => CommandRoute,
+} as any)
+const CommandThreatsRoute = CommandThreatsRouteImport.update({
+  id: '/threats',
+  path: '/threats',
   getParentRoute: () => CommandRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/command': typeof CommandRouteWithChildren
+  '/command/analytics': typeof CommandAnalyticsRoute
   '/command/hive': typeof CommandHiveRoute
+  '/command/threats': typeof CommandThreatsRoute
   '/command/': typeof CommandIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/command/analytics': typeof CommandAnalyticsRoute
   '/command/hive': typeof CommandHiveRoute
+  '/command/threats': typeof CommandThreatsRoute
   '/command': typeof CommandIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/command': typeof CommandRouteWithChildren
+  '/command/analytics': typeof CommandAnalyticsRoute
   '/command/hive': typeof CommandHiveRoute
+  '/command/threats': typeof CommandThreatsRoute
   '/command/': typeof CommandIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/command' | '/command/hive' | '/command/'
+  fullPaths:
+    | '/'
+    | '/command'
+    | '/command/analytics'
+    | '/command/hive'
+    | '/command/threats'
+    | '/command/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/command/hive' | '/command'
-  id: '__root__' | '/' | '/command' | '/command/hive' | '/command/'
+  to:
+    | '/'
+    | '/command/analytics'
+    | '/command/hive'
+    | '/command/threats'
+    | '/command'
+  id:
+    | '__root__'
+    | '/'
+    | '/command'
+    | '/command/analytics'
+    | '/command/hive'
+    | '/command/threats'
+    | '/command/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -89,6 +125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommandIndexRouteImport
       parentRoute: typeof CommandRoute
     }
+    '/command/analytics': {
+      id: '/command/analytics'
+      path: '/analytics'
+      fullPath: '/command/analytics'
+      preLoaderRoute: typeof CommandAnalyticsRouteImport
+      parentRoute: typeof CommandRoute
+    }
     '/command/hive': {
       id: '/command/hive'
       path: '/hive'
@@ -96,16 +139,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommandHiveRouteImport
       parentRoute: typeof CommandRoute
     }
+    '/command/threats': {
+      id: '/command/threats'
+      path: '/threats'
+      fullPath: '/command/threats'
+      preLoaderRoute: typeof CommandThreatsRouteImport
+      parentRoute: typeof CommandRoute
+    }
   }
 }
 
 interface CommandRouteChildren {
+  CommandAnalyticsRoute: typeof CommandAnalyticsRoute
   CommandHiveRoute: typeof CommandHiveRoute
+  CommandThreatsRoute: typeof CommandThreatsRoute
   CommandIndexRoute: typeof CommandIndexRoute
 }
 
 const CommandRouteChildren: CommandRouteChildren = {
+  CommandAnalyticsRoute: CommandAnalyticsRoute,
   CommandHiveRoute: CommandHiveRoute,
+  CommandThreatsRoute: CommandThreatsRoute,
   CommandIndexRoute: CommandIndexRoute,
 }
 
