@@ -17,11 +17,12 @@ export function FaceMesh({ className, points = 320 }: { className?: string; poin
       const layer = rand();
       const rx = 74 * (0.35 + layer * 0.65);
       const ry = 98 * (0.35 + layer * 0.65);
+      const round = (n: number) => Math.round(n * 100) / 100;
       out.push({
-        x: 100 + Math.cos(a) * rx * (0.9 + rand() * 0.2),
-        y: 120 + Math.sin(a) * ry * (0.9 + rand() * 0.2),
-        r: 0.5 + rand() * 1.1,
-        o: 0.25 + rand() * 0.7,
+        x: round(100 + Math.cos(a) * rx * (0.9 + rand() * 0.2)),
+        y: round(120 + Math.sin(a) * ry * (0.9 + rand() * 0.2)),
+        r: round(0.5 + rand() * 1.1),
+        o: round(0.25 + rand() * 0.7),
       });
     }
     return out;
