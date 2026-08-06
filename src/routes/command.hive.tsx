@@ -38,12 +38,12 @@ function HiveMind() {
             <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">{selected.detail}</p>
             <div className="mt-6 grid grid-cols-3 gap-3">
               {[
-                ["Status", selected.status],
-                ["Latency", "38ms"],
-                ["Confidence", "0.987"],
-              ].map(([l, v]) => (
+                { l: "STATUS", v: selected.status },
+                { l: "LATENCY", v: "38ms" },
+                { l: "CONFIDENCE", v: "0.987" },
+              ].map(({ l, v }) => (
                 <div key={l} className="rounded-xl border border-border bg-background/40 p-3">
-                  <p className="text-[10px] tracking-widest text-muted-foreground">{l.toUpperCase()}</p>
+                  <p className="text-[10px] tracking-widest text-muted-foreground">{l}</p>
                   <p className="mt-1 font-mono text-sm">{v}</p>
                 </div>
               ))}

@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CommandRouteImport } from './routes/command'
+import { Route as CommandIndexRouteImport } from './routes/command.index'
+import { Route as CommandHiveRouteImport } from './routes/command.hive'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,46 @@ const CommandRoute = CommandRouteImport.update({
   path: '/command',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommandIndexRoute = CommandIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CommandRoute,
+} as any)
+const CommandHiveRoute = CommandHiveRouteImport.update({
+  id: '/hive',
+  path: '/hive',
+  getParentRoute: () => CommandRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/command': typeof CommandRoute
+  '/command': typeof CommandRouteWithChildren
+  '/command/hive': typeof CommandHiveRoute
+  '/command/': typeof CommandIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/command': typeof CommandRoute
+  '/command/hive': typeof CommandHiveRoute
+  '/command': typeof CommandIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/command': typeof CommandRoute
+  '/command': typeof CommandRouteWithChildren
+  '/command/hive': typeof CommandHiveRoute
+  '/command/': typeof CommandIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/command'
+  fullPaths: '/' | '/command' | '/command/hive' | '/command/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/command'
-  id: '__root__' | '/' | '/command'
+  to: '/' | '/command/hive' | '/command'
+  id: '__root__' | '/' | '/command' | '/command/hive' | '/command/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CommandRoute: typeof CommandRoute
+  CommandRoute: typeof CommandRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +82,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommandRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/command/': {
+      id: '/command/'
+      path: '/'
+      fullPath: '/command/'
+      preLoaderRoute: typeof CommandIndexRouteImport
+      parentRoute: typeof CommandRoute
+    }
+    '/command/hive': {
+      id: '/command/hive'
+      path: '/hive'
+      fullPath: '/command/hive'
+      preLoaderRoute: typeof CommandHiveRouteImport
+      parentRoute: typeof CommandRoute
+    }
   }
 }
 
+interface CommandRouteChildren {
+  CommandHiveRoute: typeof CommandHiveRoute
+  CommandIndexRoute: typeof CommandIndexRoute
+}
+
+const CommandRouteChildren: CommandRouteChildren = {
+  CommandHiveRoute: CommandHiveRoute,
+  CommandIndexRoute: CommandIndexRoute,
+}
+
+const CommandRouteWithChildren =
+  CommandRoute._addFileChildren(CommandRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CommandRoute: CommandRoute,
+  CommandRoute: CommandRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
