@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import {
   Activity,
@@ -13,6 +14,8 @@ import {
 } from "lucide-react";
 import { Wordmark } from "@/components/aegis/Brand";
 import { ThemeProvider } from "@/lib/theme";
+import { PairDeviceModal } from "@/components/aegis/PairDeviceModal";
+import { getActivePairedDevice, type PairedDevice } from "@/lib/pairing-service";
 
 export const Route = createFileRoute("/command")({
   head: () => ({
@@ -44,6 +47,22 @@ const NAV = [
 ] as const;
 
 function CommandLayout() {
+  const [pairedDevice, setPairedDevice] = useState<PairedDevice | null>(null);
+  const [isPairModalOpen, setIsPairModalOpen] = useState(false);
+
+  async function loadDevice() {
+    try {
+      const dev = await getActivePairedDevice();
+      setPairedDevice(dev);
+    } catch (e) {
+      console.warn("Failed to check active paired device:", e);
+    }
+  }
+
+  useEffect(() => {
+    loadDevice();
+  }, []);
+
   return (
     <ThemeProvider initial="obsidian">
       <div className="grain flex min-h-screen bg-background text-foreground">
@@ -89,16 +108,39 @@ function CommandLayout() {
               Search users, apps, incidents…
             </div>
             <div className="flex items-center gap-3">
-              <span className="hidden items-center gap-2 rounded-full border border-border bg-card/50 px-3.5 py-1.5 text-[11px] text-muted-foreground sm:flex">
-                <span className="size-1.5 animate-pulse rounded-full bg-[var(--success)]" />
-                Live Protection: ACTIVE
-              </span>
+              <button
+                onClick={() => setIsPairModalOpen(true)}
+                className="flex items-center gap-2 rounded-full border border-border bg-card/50 px-3.5 py-1.5 text-[11px] transition-colors hover:border-gold/50"
+              >
+                {pairedDevice ? (
+                  <>
+                    <span className="size-1.5 animate-pulse rounded-full bg-[var(--success)]" />
+                    <span className="font-medium text-foreground">
+                      LINKED: {pairedDevice.model || "DEVICE"}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="size-1.5 rounded-full bg-gold animate-ping" />
+                    <span className="text-gold font-medium">PAIR DEVICE</span>
+                  </>
+                )}
+              </button>
               <button className="rounded-full border border-border bg-card/50 p-2 text-muted-foreground transition-colors duration-500 hover:text-foreground">
                 <Bell className="size-4" strokeWidth={1.5} />
               </button>
               <span className="size-8 rounded-full border border-gold/50 bg-gradient-to-br from-[var(--gold-soft)] to-[var(--gold)]" />
             </div>
           </header>
+
+          <PairDeviceModal
+            isOpen={isPairModalOpen}
+            onClose={() => setIsPairModalOpen(false)}
+            onPairingSuccess={() => {
+              loadDevice();
+            }}
+            activeDevice={pairedDevice}
+          />
 
           <nav className="flex gap-1 overflow-x-auto border-b border-border px-4 py-2 lg:hidden">
             {NAV.map((item) => (

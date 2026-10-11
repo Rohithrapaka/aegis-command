@@ -1,4 +1,4 @@
-import { getSupabase, isSupabaseConfigured } from "./supabase";
+import { getSupabase, isSupabaseConfigured, ensureAuthenticatedDashboardSession } from "./supabase";
 import type {
   BiometricProfileSummary,
   AuthenticationEvent,
@@ -13,6 +13,7 @@ import type {
  * Returns empty array if no real profiles or Supabase is unconfigured.
  */
 export async function fetchBiometricProfiles(): Promise<BiometricProfileSummary[]> {
+  await ensureAuthenticatedDashboardSession();
   const supabase = getSupabase();
   if (!supabase) return [];
 
@@ -21,7 +22,11 @@ export async function fetchBiometricProfiles(): Promise<BiometricProfileSummary[
     .select("*")
     .order("profile_index", { ascending: true });
 
-  if (error || !data) return [];
+  if (error) {
+    console.warn("Supabase biometric_profiles query returned error:", error.message);
+    return [];
+  }
+  if (!data) return [];
 
   return data.map((row) => ({
     id: row.id,
@@ -40,6 +45,7 @@ export async function fetchBiometricProfiles(): Promise<BiometricProfileSummary[
  * Fetch authentication event timeline from Supabase.
  */
 export async function fetchAuthTimeline(limit = 20): Promise<AuthenticationEvent[]> {
+  await ensureAuthenticatedDashboardSession();
   const supabase = getSupabase();
   if (!supabase) return [];
 
@@ -49,7 +55,11 @@ export async function fetchAuthTimeline(limit = 20): Promise<AuthenticationEvent
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  if (error || !data) return [];
+  if (error) {
+    console.warn("Supabase authentication_events query returned error:", error.message);
+    return [];
+  }
+  if (!data) return [];
 
   return data.map((row) => ({
     id: row.id,
@@ -71,6 +81,7 @@ export async function fetchAuthTimeline(limit = 20): Promise<AuthenticationEvent
  * Fetch security alerts & incidents from Supabase.
  */
 export async function fetchSecurityAlerts(limit = 20): Promise<SecurityAlert[]> {
+  await ensureAuthenticatedDashboardSession();
   const supabase = getSupabase();
   if (!supabase) return [];
 
@@ -80,7 +91,11 @@ export async function fetchSecurityAlerts(limit = 20): Promise<SecurityAlert[]> 
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  if (error || !data) return [];
+  if (error) {
+    console.warn("Supabase security_alerts query returned error:", error.message);
+    return [];
+  }
+  if (!data) return [];
 
   return data.map((row) => ({
     id: row.id,
@@ -97,6 +112,7 @@ export async function fetchSecurityAlerts(limit = 20): Promise<SecurityAlert[]> 
  * Fetch protected apps configured for devices.
  */
 export async function fetchProtectedApps(): Promise<ProtectedAppSummary[]> {
+  await ensureAuthenticatedDashboardSession();
   const supabase = getSupabase();
   if (!supabase) return [];
 
@@ -105,7 +121,11 @@ export async function fetchProtectedApps(): Promise<ProtectedAppSummary[]> {
     .select("*")
     .order("app_label", { ascending: true });
 
-  if (error || !data) return [];
+  if (error) {
+    console.warn("Supabase protected_apps query returned error:", error.message);
+    return [];
+  }
+  if (!data) return [];
 
   return data.map((row) => ({
     id: row.id,
@@ -122,6 +142,7 @@ export async function fetchProtectedApps(): Promise<ProtectedAppSummary[]> {
  * Calculate aggregated KPIs derived strictly from real Supabase records.
  */
 export async function fetchDashboardKPIs(): Promise<DashboardKPIs> {
+  await ensureAuthenticatedDashboardSession();
   const supabase = getSupabase();
   if (!supabase) {
     return {

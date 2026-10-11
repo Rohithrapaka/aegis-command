@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient, Session } from "@supabase/supabase-js";
 
 // Read public environment variables safely with indexed access for TypeScript strict mode
 // Supports both VITE_ and NEXT_PUBLIC_ prefixes for deployment flexibility
@@ -16,8 +16,9 @@ export function isSupabaseConfigured(): boolean {
 let clientInstance: SupabaseClient | null = null;
 
 /**
- * Supabase client instance using the anonymous/publishable public key.
- * If credentials are not present, operations gracefully resolve to empty data.
+ * Supabase client instance using persistent anonymous/session authentication.
+ * Enables localStorage session caching and auto token refresh so the dashboard
+ * holds a stable authenticated session needed for paired RLS reads.
  */
 export function getSupabase(): SupabaseClient | null {
   if (!isSupabaseConfigured()) {
@@ -26,10 +27,37 @@ export function getSupabase(): SupabaseClient | null {
   if (!clientInstance) {
     clientInstance = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        persistSession: false,
-        autoRefreshToken: false,
+        persistSession: true,
+        autoRefreshToken: true,
+        storageKey: "aegis_command_auth_session",
       },
     });
   }
   return clientInstance;
+}
+
+/**
+ * Ensures the dashboard browser holds an active authenticated anonymous session.
+ * If no session exists, signs in anonymously to obtain a valid auth.uid().
+ */
+export async function ensureAuthenticatedDashboardSession(): Promise<Session | null> {
+  const client = getSupabase();
+  if (!client) return null;
+
+  try {
+    const { data: sessionData, error: sessionError } = await client.auth.getSession();
+    if (!sessionError && sessionData?.session) {
+      return sessionData.session;
+    }
+
+    const { data: authData, error: authError } = await client.auth.signInAnonymously();
+    if (authError || !authData?.session) {
+      console.warn("Could not initialize anonymous dashboard session:", authError?.message);
+      return null;
+    }
+    return authData.session;
+  } catch (err) {
+    console.warn("Failed to check dashboard session:", err);
+    return null;
+  }
 }
